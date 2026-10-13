@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Modal,
@@ -18,7 +18,8 @@ import { IconButton } from '@/components/ui/IconButton';
 import { Card } from '@/components/ui/Card';
 import { AnimalThumb } from '@/components/ui/AnimalThumb';
 import { useTheme, spacing, radius } from '@/theme';
-import { demoAnimals, type AnimalRecord } from '@/features/animals/demoData';
+import type { AnimalRecord } from '@/features/animals/types';
+import { animalRepository } from '@/features/animals/repository';
 import { getAnimalCopy, formatLastSeen, type AnimalCopy } from '@/features/animals/labels';
 
 type FilterOption = { value: string; label: string };
@@ -107,6 +108,31 @@ export default function AnimalsScreen() {
   const language = (i18n.resolvedLanguage ?? i18n.language).split('-')[0];
   const copy = getAnimalCopy(language);
 
+  const [animals, setAnimals] = useState<AnimalRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  const loadAnimals = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(false);
+
+    try {
+      setAnimals(await animalRepository.listAnimals());
+    } catch {
+      setLoadError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      void loadAnimals();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [loadAnimals]);
+
   const [search, setSearch] = useState('');
   const [speciesFilter, setSpeciesFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -125,7 +151,7 @@ export default function AnimalsScreen() {
   const filteredAnimals = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return demoAnimals
+    return animals
       .filter((animal) => {
         const matchesSearch =
           !query ||
@@ -152,7 +178,7 @@ export default function AnimalsScreen() {
           ? a.id.localeCompare(b.id)
           : a.lastSeenDaysAgo - b.lastSeenDaysAgo,
       );
-  }, [search, speciesFilter, statusFilter, zoneFilter, lastSeenFilter, sortBy]);
+  }, [animals, search, speciesFilter, statusFilter, zoneFilter, lastSeenFilter, sortBy]);
 
   const speciesOptions: FilterOption[] = [
     { value: 'all', label: copy.all },
@@ -283,10 +309,23 @@ export default function AnimalsScreen() {
         ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <AppText variant="title" strong>{copy.noResults}</AppText>
-            <Button variant="ghost" onPress={clearFilters}>
-              {copy.clearFilters}
-            </Button>
+            {isLoading ? (
+              <AppText muted>Loading animals…</AppText>
+            ) : loadError ? (
+              <>
+                <AppText variant="title" strong>Unable to load animals.</AppText>
+                <Button variant="ghost" onPress={() => void loadAnimals()}>
+                  Retry
+                </Button>
+              </>
+            ) : (
+              <>
+                <AppText variant="title" strong>{copy.noResults}</AppText>
+                <Button variant="ghost" onPress={clearFilters}>
+                  {copy.clearFilters}
+                </Button>
+              </>
+            )}
           </View>
         }
         renderItem={({ item }) => (

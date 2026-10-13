@@ -1,14 +1,17 @@
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/components/ui/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
+import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { AnimalThumb } from '@/components/ui/AnimalThumb';
 import { Card } from '@/components/ui/Card';
 import { useTheme, spacing, radius } from '@/theme';
-import { demoAnimals, type AnimalRecord } from '@/features/animals/demoData';
+import type { AnimalRecord } from '@/features/animals/types';
+import { animalRepository } from '@/features/animals/repository';
 import { getAnimalCopy, formatLastSeen, type AnimalCopy } from '@/features/animals/labels';
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -57,18 +60,60 @@ export default function AnimalProfileScreen() {
   const { colors } = useTheme();
   const language = (i18n.resolvedLanguage ?? i18n.language).split('-')[0];
   const copy = getAnimalCopy(language);
-  const animal = demoAnimals.find((item) => item.id === params.id);
+  const [animal, setAnimal] = useState<AnimalRecord | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  const loadAnimal = useCallback(async () => {
+    const id = params.id;
+
+    if (typeof id !== 'string' || !id) {
+      setAnimal(null);
+      setIsLoading(false);
+      setLoadError(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setLoadError(false);
+    setAnimal(null);
+
+    try {
+      setAnimal(await animalRepository.getAnimalById(id));
+    } catch {
+      setLoadError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [params.id]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      void loadAnimal();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [loadAnimal]);
 
   return (
     <ScreenContainer stripes style={styles.page}>
       <View style={styles.header}>
         <IconButton name="back" label={copy.back} onPress={() => router.back()} />
         <AppText variant="subtitle" strong>
-          {animal ? animal.id : copy.notFound}
+          {isLoading ? 'Loading…' : loadError ? 'Unable to load' : animal ? animal.id : copy.notFound}
         </AppText>
       </View>
 
-      {!animal ? null : (
+      {isLoading ? (
+        <AppText muted>Loading animal profile…</AppText>
+      ) : loadError ? (
+        <Card>
+          <AppText>Unable to load this animal profile.</AppText>
+          <Button onPress={() => void loadAnimal()}>Retry</Button>
+        </Card>
+      ) : !animal ? (
+        <AppText>{copy.notFound}</AppText>
+      ) : (
         <>
           <Card>
             <View style={styles.hero}>
