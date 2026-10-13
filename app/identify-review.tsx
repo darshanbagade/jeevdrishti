@@ -6,6 +6,7 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/components/ui/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
 import { Icon } from '@/components/ui/Icon';
@@ -16,9 +17,11 @@ import { spacing, radius, useTheme } from '@/theme';
 
 export default function IdentifyReviewScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   const assets = useIdentifySelectionStore((state) => state.assets);
+  const setAssets = useIdentifySelectionStore((state) => state.setAssets);
 
   return (
     <ScreenContainer stripes style={styles.page}>
@@ -28,7 +31,7 @@ export default function IdentifyReviewScreen() {
         style={styles.backButton}
       >
         <Icon name="back" color={colors.text} size={20} />
-        <AppText>Back to input</AppText>
+        <AppText>{t('identifyFlow.backToInput')}</AppText>
       </Pressable>
 
       <View style={styles.heading}>
@@ -37,25 +40,23 @@ export default function IdentifyReviewScreen() {
           strong
           style={{ color: colors.primary }}
         >
-          STEP 2 OF 5
+          {t('identifyFlow.stepReview')}
         </AppText>
 
         <AppText variant="display" strong>
-          Review your input
+          {t('identifyFlow.reviewTitle')}
         </AppText>
 
         <AppText muted>
-          Check your selected media before proceeding to identification.
+          {t('identifyFlow.reviewSubtitle')}
         </AppText>
       </View>
 
       <View style={styles.sectionHeading}>
-        <AppText variant="subtitle" strong>
-          Selected media
-        </AppText>
+        <AppText variant="subtitle" strong>{t('identifyFlow.selectedMedia')}</AppText>
 
         <AppText variant="caption" muted>
-          {assets.length} selected
+          {t('identifyFlow.selectedCount', { value: assets.length })}
         </AppText>
       </View>
 
@@ -71,10 +72,10 @@ export default function IdentifyReviewScreen() {
         >
           <Icon name="alert" color={colors.textMuted} size={28} />
 
-          <AppText strong>No media received</AppText>
+          <AppText strong>{t('identifyFlow.noMediaReceived')}</AppText>
 
           <AppText variant="caption" muted>
-            Return to the previous screen and select your input again.
+            {t('identifyFlow.returnToInput')}
           </AppText>
         </View>
       ) : (
@@ -99,10 +100,10 @@ export default function IdentifyReviewScreen() {
                 >
                   <Icon name="camera" color={colors.primary} size={30} />
 
-                  <AppText strong>Video selected</AppText>
+                  <AppText strong>{t('identifyFlow.videoSelected')}</AppText>
 
                   <AppText variant="caption" muted>
-                    {asset.fileName ?? 'Selected video'}
+                    {asset.fileName ?? t('identifyFlow.selectedVideo')}
                   </AppText>
                 </View>
               ) : (
@@ -110,22 +111,40 @@ export default function IdentifyReviewScreen() {
                   source={{ uri: asset.uri }}
                   style={styles.imagePreview}
                   resizeMode="cover"
-                  accessibilityLabel={`Review image ${index + 1}`}
+                  accessibilityLabel={t('identifyFlow.reviewImageAccessibilityLabel', { value: index + 1 })}
                 />
               )}
 
               <View style={styles.mediaDetails}>
                 <AppText strong>
                   {asset.type === 'video'
-                    ? 'Video input'
-                    : `Image ${index + 1}`}
+                    ? t('identifyFlow.videoInput')
+                    : t('identifyFlow.imageLabel', { value: index + 1 })}
                 </AppText>
 
                 <AppText variant="caption" muted>
                   {asset.width && asset.height
                     ? `${asset.width} × ${asset.height}`
-                    : asset.fileName ?? 'Selected media'}
+                    : asset.fileName ?? t('identifyFlow.selectedMedia')}
                 </AppText>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('identifyFlow.removeSelectedItem', { value: index + 1 })}
+                  onPress={() =>
+                    setAssets((current) =>
+                      current.filter((_, itemIndex) => itemIndex !== index),
+                    )
+                  }
+                  style={styles.removeMediaButton}
+                >
+                  <AppText
+                    variant="caption"
+                    strong
+                    style={{ color: colors.danger }}
+                  >
+                    {t('identifyFlow.remove')}
+                  </AppText>
+                </Pressable>
               </View>
             </View>
           ))}
@@ -144,13 +163,9 @@ export default function IdentifyReviewScreen() {
         <Icon name="identify" color={colors.primary} size={22} />
 
         <View style={styles.noticeText}>
-          <AppText strong>Ready for the next stage</AppText>
+          <AppText strong>{t('identifyFlow.readyNextTitle')}</AppText>
 
-          <AppText variant="caption" muted>
-            The ML identification service is not connected yet. This
-            screen reviews your input and does not generate real animal
-            matches.
-          </AppText>
+          <AppText variant="caption" muted>{t('identifyFlow.mlNotConnected')}</AppText>
         </View>
       </View>
     </ScreenContainer>
@@ -200,7 +215,12 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.xs,
   },
-  emptyState: {
+  removeMediaButton: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.medium,
+  },  emptyState: {
     borderWidth: 1,
     borderRadius: radius.large,
     padding: spacing.xl,

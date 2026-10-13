@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useIdentifySelectionStore } from '@/features/identification/selectionStore';
 import { ScreenContainer } from '@/components/ui/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
@@ -18,6 +19,7 @@ type CaptureMode = 'photo' | 'video';
 
 export default function IdentifyScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   const assets = useIdentifySelectionStore((state) => state.assets);
@@ -33,8 +35,8 @@ export default function IdentifyScreen() {
 
       if (!permission.granted) {
         Alert.alert(
-          'Camera permission required',
-          'Allow camera access to capture photos or videos.',
+          t('identifyFlow.cameraPermissionTitle'),
+          t('identifyFlow.cameraPermissionMessage'),
         );
         return;
       }
@@ -61,8 +63,8 @@ export default function IdentifyScreen() {
 
       if (assets.length >= 5) {
         Alert.alert(
-          'Image limit reached',
-          'Select up to five images.',
+          t('identifyFlow.limitReachedTitle'),
+          t('identifyFlow.limitReachedMessage'),
         );
         return;
       }
@@ -70,8 +72,8 @@ export default function IdentifyScreen() {
       setAssets((current) => [...current, asset]);
     } catch (error) {
       Alert.alert(
-        'Unable to open camera',
-        error instanceof Error ? error.message : 'Please try again.',
+        t('identifyFlow.cameraError'),
+        error instanceof Error ? error.message : t('identifyFlow.tryAgain'),
       );
     } finally {
       setIsBusy(false);
@@ -99,8 +101,8 @@ export default function IdentifyScreen() {
 
       if (mediaTypes.size > 1) {
         Alert.alert(
-          'Choose one media type',
-          'Select images or one video at a time.',
+          t('identifyFlow.chooseOneType'),
+          t('identifyFlow.chooseOneTypeMessage'),
         );
         return;
       }
@@ -110,8 +112,8 @@ export default function IdentifyScreen() {
         result.assets.length > 1
       ) {
         Alert.alert(
-          'Choose one video',
-          'Select a single video at a time.',
+          t('identifyFlow.chooseOneVideo'),
+          t('identifyFlow.chooseOneVideoMessage'),
         );
         return;
       }
@@ -121,8 +123,8 @@ export default function IdentifyScreen() {
         assets.some((asset) => asset.type === 'image')
       ) {
         Alert.alert(
-          'Replace selected images?',
-          'Remove the current images before selecting a video.',
+          t('identifyFlow.replaceImagesTitle'),
+          t('identifyFlow.replaceImagesMessage'),
         );
         return;
       }
@@ -132,16 +134,16 @@ export default function IdentifyScreen() {
         assets.some((asset) => asset.type === 'video')
       ) {
         Alert.alert(
-          'Replace selected video?',
-          'Remove the current video before selecting images.',
+          t('identifyFlow.replaceVideoTitle'),
+          t('identifyFlow.replaceVideoMessage'),
         );
         return;
       }
 
       if (result.assets.length > 5) {
         Alert.alert(
-          'Image limit reached',
-          'Select up to five images.',
+          t('identifyFlow.limitReachedTitle'),
+          t('identifyFlow.limitReachedMessage'),
         );
         return;
       }
@@ -149,8 +151,8 @@ export default function IdentifyScreen() {
       setAssets(result.assets);
     } catch (error) {
       Alert.alert(
-        'Unable to open gallery',
-        error instanceof Error ? error.message : 'Please try again.',
+        t('identifyFlow.galleryError'),
+        error instanceof Error ? error.message : t('identifyFlow.tryAgain'),
       );
     } finally {
       setIsBusy(false);
@@ -161,12 +163,12 @@ export default function IdentifyScreen() {
     <ScreenContainer stripes style={styles.page}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Go back"
+        accessibilityLabel={t('identifyFlow.goBack')}
         onPress={() => router.back()}
         style={styles.backButton}
       >
         <Icon name="back" color={colors.text} size={20} />
-        <AppText>Back</AppText>
+        <AppText>{t('identifyFlow.back')}</AppText>
       </Pressable>
 
       <View style={styles.heading}>
@@ -175,17 +177,14 @@ export default function IdentifyScreen() {
           strong
           style={{ color: colors.primary }}
         >
-          STEP 1 OF 5
+          {t('identifyFlow.stepCapture')}
         </AppText>
 
         <AppText variant="display" strong>
-          Identify wildlife
+          {t('identifyFlow.title')}
         </AppText>
 
-        <AppText muted>
-          Capture a sighting or choose existing media to identify
-          an animal.
-        </AppText>
+        <AppText muted>{t('identifyFlow.subtitle')}</AppText>
       </View>
 
       <View style={styles.actions}>
@@ -213,10 +212,10 @@ export default function IdentifyScreen() {
 
           <View style={styles.actionText}>
             <AppText variant="subtitle" strong>
-              Take a photo
+              {t('identifyFlow.takePhoto')}
             </AppText>
             <AppText variant="caption" muted>
-              Capture an animal image
+              {t('identifyFlow.takePhotoCaption')}
             </AppText>
           </View>
 
@@ -251,10 +250,10 @@ export default function IdentifyScreen() {
 
           <View style={styles.actionText}>
             <AppText variant="subtitle" strong>
-              Record a video
+              {t('identifyFlow.recordVideo')}
             </AppText>
             <AppText variant="caption" muted>
-              Record up to 15 seconds
+              {t('identifyFlow.recordVideoCaption')}
             </AppText>
           </View>
 
@@ -289,10 +288,10 @@ export default function IdentifyScreen() {
 
           <View style={styles.actionText}>
             <AppText variant="subtitle" strong>
-              Choose from gallery
+              {t('identifyFlow.chooseGallery')}
             </AppText>
             <AppText variant="caption" muted>
-              Up to five images or one video
+              {t('identifyFlow.galleryCaption')}
             </AppText>
           </View>
 
@@ -306,10 +305,10 @@ export default function IdentifyScreen() {
 
       <View style={styles.sectionHeading}>
         <AppText variant="subtitle" strong>
-          Selected input
+          {t('identifyFlow.selectedInput')}
         </AppText>
         <AppText variant="caption" muted>
-          {assets.length} selected
+          {t('identifyFlow.selectedCount', { value: assets.length })}
         </AppText>
       </View>
 
@@ -325,14 +324,14 @@ export default function IdentifyScreen() {
         >
           <Icon name="image" color={colors.textMuted} size={30} />
 
-          <AppText strong>No media selected</AppText>
+          <AppText strong>{t('identifyFlow.noMedia')}</AppText>
 
           <AppText
             variant="caption"
             muted
             style={styles.emptyDescription}
           >
-            Your selected photos or video will appear here for review.
+            {t('identifyFlow.previewHint')}
           </AppText>
         </View>
       ) : (
@@ -364,7 +363,7 @@ export default function IdentifyScreen() {
                   <AppText strong>Video selected</AppText>
 
                   <AppText variant="caption" muted>
-                    {asset.fileName ?? 'Selected video'}
+                    {asset.fileName ?? t('identifyFlow.selectedVideo')}
                   </AppText>
                 </View>
               ) : (
@@ -372,13 +371,13 @@ export default function IdentifyScreen() {
                   source={{ uri: asset.uri }}
                   style={styles.previewImage}
                   resizeMode="cover"
-                  accessibilityLabel={`Selected wildlife image ${index + 1}`}
+                  accessibilityLabel={t('identifyFlow.imageAccessibilityLabel', { value: index + 1 })}
                 />
               )}
 
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Remove selected item ${index + 1}`}
+                accessibilityLabel={t('identifyFlow.removeSelectedItem', { value: index + 1 })}
                 onPress={() =>
                   setAssets((current) =>
                     current.filter((_, itemIndex) => itemIndex !== index),
@@ -386,13 +385,7 @@ export default function IdentifyScreen() {
                 }
                 style={styles.removeButton}
               >
-                <AppText
-                  variant="caption"
-                  strong
-                  style={{ color: colors.danger }}
-                >
-                  Remove
-                </AppText>
+                <AppText variant="caption" strong style={{ color: colors.danger }}>{t('identifyFlow.remove')}</AppText>
               </Pressable>
             </View>
           ))}
@@ -401,17 +394,14 @@ export default function IdentifyScreen() {
 
       {isBusy && (
         <AppText variant="caption" muted>
-          Opening media picker…
+          {t('identifyFlow.openingMedia')}
         </AppText>
       )}
 
-      <AppText variant="caption" muted>
-        Identification and top-five ranking will be connected in the
-        next stages.
-      </AppText>
+      <AppText variant="caption" muted>{t('identifyFlow.processingNotice')}</AppText>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Continue to review selected media"
+        accessibilityLabel={t('identifyFlow.continueAccessibilityLabel')}
         disabled={isBusy || assets.length === 0}
         onPress={() => router.push('/identify-review')}
         style={[
@@ -420,9 +410,7 @@ export default function IdentifyScreen() {
           (isBusy || assets.length === 0) && styles.disabled,
         ]}
       >
-        <AppText strong style={{ color: '#FFFFFF' }}>
-          Continue to review
-        </AppText>
+        <AppText strong style={{ color: '#FFFFFF' }}>{t('identifyFlow.continueToReview')}</AppText>
         <Icon name="forward" color="#FFFFFF" size={20} />
       </Pressable>
     </ScreenContainer>
