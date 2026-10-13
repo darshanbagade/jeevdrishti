@@ -89,7 +89,7 @@ export default function HomeScreen() {
             variant="accent"
             icon="identify"
             style={styles.identifyButton}
-            onPress={() => comingSoon(t('dashboard.identify'))}
+            onPress={() => router.push('/identify')}
           >
             {t('dashboard.identify')}
           </Button>
