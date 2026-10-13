@@ -1,6 +1,6 @@
 import '@/i18n';
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -21,11 +21,37 @@ import {
   NotoSansDevanagari_700Bold,
 } from '@expo-google-fonts/noto-sans-devanagari';
 import { ThemeProvider, useTheme } from '@/theme';
+import { useAuthStore } from '@/store/authStore';
 
 void SplashScreen.preventAutoHideAsync();
 
 function AppNavigator() {
   const { isDark, colors } = useTheme();
+  const router = useRouter();
+  const segments = useSegments();
+
+  const token = useAuthStore((state) => state.token);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const hydrate = useAuthStore((state) => state.hydrate);
+
+  useEffect(() => {
+    void hydrate();
+  }, [hydrate]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+    const inDevGroup = segments[0] === '_dev';
+
+    if (!token && !inAuthGroup && !(__DEV__ && inDevGroup)) {
+      router.replace('/login');
+    } else if (token && inAuthGroup) {
+      router.replace('/');
+    }
+  }, [isHydrated, token, segments, router]);
+
+  if (!isHydrated) return null;
 
   return (
     <>
@@ -60,9 +86,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <ThemeProvider>

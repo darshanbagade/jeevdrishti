@@ -14,6 +14,7 @@ import { StatCard } from '@/components/ui/StatCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AnimalThumb } from '@/components/ui/AnimalThumb';
 import { spacing, radius, useTheme } from '@/theme';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -50,6 +51,7 @@ export default function HomeScreen() {
         )}
       </View>
 
+      <LanguageSwitcher />
       <View style={[styles.hero, { borderColor: colors.border }]}>
         <LinearGradient
           colors={[colors.primaryStrong, colors.surface, colors.background]}
@@ -86,6 +88,7 @@ export default function HomeScreen() {
           <Button
             variant="accent"
             icon="identify"
+            style={styles.identifyButton}
             onPress={() => comingSoon(t('dashboard.identify'))}
           >
             {t('dashboard.identify')}
@@ -231,6 +234,7 @@ const styles = StyleSheet.create({
   heroTitle: { maxWidth: 300 },
   heroBody: { lineHeight: 24 },
   heroButton: { alignSelf: 'flex-start', marginTop: spacing.xs },
+  identifyButton: { width: 200, minHeight: 48 },
   heroFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   section: { gap: spacing.md },
   statRow: { flexDirection: 'row', gap: spacing.sm },

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import type { PropsWithChildren } from 'react';
 import { AppText } from './AppText';
 import { Icon, type IconName } from './Icon';
@@ -10,9 +10,10 @@ type Props = PropsWithChildren<{
   disabled?: boolean;
   icon?: IconName;
   accessibilityLabel?: string;
+  style?: StyleProp<ViewStyle>;
 }>;
 
-export function Button({ children, onPress, variant = 'primary', disabled = false, icon, accessibilityLabel }: Props) {
+export function Button({ children, onPress, variant = 'primary', disabled = false, icon, accessibilityLabel, style }: Props) {
   const { colors } = useTheme();
   const background = variant === 'primary' ? colors.primaryStrong
     : variant === 'accent' ? colors.accent
@@ -29,6 +30,7 @@ export function Button({ children, onPress, variant = 'primary', disabled = fals
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
+        style,
         {
           backgroundColor: background,
           borderColor: variant === 'ghost' ? colors.border : background,
@@ -39,7 +41,7 @@ export function Button({ children, onPress, variant = 'primary', disabled = fals
     >
       <View style={styles.content}>
         {icon ? <Icon name={icon} size={18} color={foreground} /> : null}
-        <AppText strong style={{ color: foreground }}>{children}</AppText>
+        <AppText numberOfLines={1} strong style={{ color: foreground }}>{children}</AppText>
       </View>
     </Pressable>
   );
