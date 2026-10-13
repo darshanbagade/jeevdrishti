@@ -301,6 +301,41 @@ export default function IdentifyScreen() {
             size={19}
           />
         </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/cctv-cameras')}
+          style={[
+            styles.action,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.actionIcon,
+              { backgroundColor: colors.surfaceRaised },
+            ]}
+          >
+            <Icon name="camera" color={colors.primary} size={23} />
+          </View>
+
+          <View style={styles.actionText}>
+            <AppText variant="subtitle" strong>
+              {t('identifyFlow.cctvInput')}
+            </AppText>
+            <AppText variant="caption" muted>
+              {t('identifyFlow.cctvInputCaption')}
+            </AppText>
+          </View>
+
+          <Icon
+            name="forward"
+            color={colors.textMuted}
+            size={19}
+          />
+        </Pressable>
       </View>
 
       <View style={styles.sectionHeading}>
