@@ -1,6 +1,7 @@
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { setLanguagePreference } from '@/i18n';
 import { ScreenContainer } from '@/components/ui/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
 import { Button } from '@/components/ui/Button';
@@ -25,8 +26,8 @@ export default function UIKitScreen() {
       <View style={styles.header}>
         <IconButton name="back" label="Back" onPress={() => router.back()} />
         <View style={styles.titleBlock}>
-          <AppText variant="display" strong>{t('ui.title')}</AppText>
-          <AppText muted>{t('ui.subtitle')}</AppText>
+          <AppText variant="subtitle" strong>{t('ui.title')}</AppText>
+
         </View>
       </View>
 
@@ -56,19 +57,19 @@ export default function UIKitScreen() {
       <View style={styles.row}>
         <Button
           variant={currentLanguage === 'en' ? 'primary' : 'ghost'}
-          onPress={() => void i18n.changeLanguage('en')}
+          onPress={() => void setLanguagePreference('en')}
         >
           English
         </Button>
         <Button
           variant={currentLanguage === 'hi' ? 'primary' : 'ghost'}
-          onPress={() => void i18n.changeLanguage('hi')}
+          onPress={() => void setLanguagePreference('hi')}
         >
           हिन्दी
         </Button>
         <Button
           variant={currentLanguage === 'mr' ? 'primary' : 'ghost'}
-          onPress={() => void i18n.changeLanguage('mr')}
+          onPress={() => void setLanguagePreference('mr')}
         >
           मराठी
         </Button>

@@ -39,14 +39,14 @@ export default function HomeScreen() {
           </View>
           <View style={styles.brandText}>
             <AppText variant="subtitle" strong>JeevDrishti</AppText>
-            <AppText variant="caption" muted>{t('dashboard.greeting')}</AppText>
+
           </View>
         </View>
         {__DEV__ && (
           <IconButton
             name="settings"
-            label={t('dashboard.previewKit')}
-            onPress={() => router.push('/_dev/ui-kit')}
+            label="Settings"
+            onPress={() => router.push('/settings')}
           />
         )}
       </View>

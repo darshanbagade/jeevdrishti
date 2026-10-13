@@ -1,4 +1,5 @@
 import { createInstance } from 'i18next';
+import * as SecureStore from 'expo-secure-store';
 import { initReactI18next } from 'react-i18next';
 
 const en = {
@@ -267,5 +268,42 @@ void i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
   react: { useSuspense: false },
 });
+
+export type AppLanguage = 'en' | 'hi' | 'mr';
+
+const LANGUAGE_PREFERENCE_KEY = 'jeevdrishti.language';
+
+function isAppLanguage(value: string | null): value is AppLanguage {
+  return value === 'en' || value === 'hi' || value === 'mr';
+}
+
+export async function hydrateLanguagePreference(): Promise<void> {
+  try {
+    const savedLanguage = await SecureStore.getItemAsync(
+      LANGUAGE_PREFERENCE_KEY,
+    );
+
+    if (isAppLanguage(savedLanguage)) {
+      await i18n.changeLanguage(savedLanguage);
+    }
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('Unable to load saved language preference.', error);
+    }
+  }
+}
+
+export async function setLanguagePreference(
+  language: AppLanguage,
+): Promise<void> {
+  try {
+    await i18n.changeLanguage(language);
+    await SecureStore.setItemAsync(LANGUAGE_PREFERENCE_KEY, language);
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('Unable to save language preference.', error);
+    }
+  }
+}
 
 export default i18n;

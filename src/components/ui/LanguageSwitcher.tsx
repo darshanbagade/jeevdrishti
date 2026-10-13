@@ -1,12 +1,13 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { setLanguagePreference } from '@/i18n';
 import { AppText } from './AppText';
 import { radius, spacing, useTheme } from '@/theme';
 
 const languages = [
   { code: 'en', label: 'EN' },
-  { code: 'hi', label: 'हिन्दी' },
-  { code: 'mr', label: 'मराठी' },
+  { code: 'hi', label: '\u0939\u093f\u0928\u094d\u0926\u0940' },
+  { code: 'mr', label: '\u092e\u0930\u093e\u0920\u0940' },
 ] as const;
 
 export function LanguageSwitcher() {
@@ -38,7 +39,7 @@ export function LanguageSwitcher() {
             accessibilityLabel={language.label}
             accessibilityState={{ selected }}
             onPress={() => {
-              void i18n.changeLanguage(language.code);
+              void setLanguagePreference(language.code);
             }}
             style={[
               styles.option,

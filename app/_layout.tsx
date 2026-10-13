@@ -1,5 +1,5 @@
-import '@/i18n';
-import { useEffect } from 'react';
+import { hydrateLanguagePreference } from '@/i18n';
+import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -20,7 +20,7 @@ import {
   NotoSansDevanagari_600SemiBold,
   NotoSansDevanagari_700Bold,
 } from '@expo-google-fonts/noto-sans-devanagari';
-import { ThemeProvider, useTheme } from '@/theme';
+import { ThemeProvider, useTheme, useThemeModeStore } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
 
 void SplashScreen.preventAutoHideAsync();
@@ -33,6 +33,15 @@ function AppNavigator() {
   const token = useAuthStore((state) => state.token);
   const isHydrated = useAuthStore((state) => state.isHydrated);
   const hydrate = useAuthStore((state) => state.hydrate);
+  const hydrateTheme = useThemeModeStore((state) => state.hydrate);
+  const [preferencesHydrated, setPreferencesHydrated] = useState(false);
+
+  useEffect(() => {
+    void Promise.all([hydrateTheme(), hydrateLanguagePreference()]).then(
+      () => setPreferencesHydrated(true),
+      () => setPreferencesHydrated(true),
+    );
+  }, [hydrateTheme]);
 
   useEffect(() => {
     void hydrate();
@@ -51,7 +60,7 @@ function AppNavigator() {
     }
   }, [isHydrated, token, segments, router]);
 
-  if (!isHydrated) return null;
+  if (!isHydrated || !preferencesHydrated) return null;
 
   return (
     <>
