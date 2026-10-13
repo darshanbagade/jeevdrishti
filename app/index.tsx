@@ -108,9 +108,14 @@ export default function HomeScreen() {
         />
 
         <View style={styles.statRow}>
-          <View style={styles.statItem}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open animal profiles"
+            onPress={() => router.push('/animals')}
+            style={styles.statItem}
+          >
             <StatCard label={t('dashboard.animals')} value="06" icon="animals" />
-          </View>
+          </Pressable>
           <View style={styles.statItem}>
             <StatCard label={t('dashboard.referenceImages')} value="33" icon="image" />
           </View>

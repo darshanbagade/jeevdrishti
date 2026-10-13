@@ -1,0 +1,91 @@
+export type AnimalRecord = {
+  id: string;
+  displayName?: string;
+  species: 'Tiger' | 'Leopard';
+  status: 'active' | 'archived';
+  zone: 'core' | 'buffer';
+  firstSeen: string;
+  lastSeenDaysAgo: number;
+  sightings: number;
+  source: 'camera' | 'field';
+  cameraCode?: string;
+  sex?: 'female' | 'male';
+  ageClass?: 'adult' | 'subadult';
+  notes?: string;
+};
+
+export const demoAnimals: AnimalRecord[] = [
+  {
+    id: 'T-003',
+    displayName: 'Bamboo Trail female',
+    species: 'Tiger',
+    status: 'active',
+    zone: 'core',
+    firstSeen: '18 Mar 2026',
+    lastSeenDaysAgo: 0,
+    sightings: 14,
+    source: 'camera',
+    cameraCode: 'C-008',
+    sex: 'female',
+    ageClass: 'adult',
+    notes: 'Illustrative demo record.',
+  },
+  {
+    id: 'T-011',
+    species: 'Tiger',
+    status: 'active',
+    zone: 'buffer',
+    firstSeen: '02 May 2026',
+    lastSeenDaysAgo: 1,
+    sightings: 9,
+    source: 'field',
+    sex: 'male',
+    ageClass: 'adult',
+  },
+  {
+    id: 'T-007',
+    species: 'Tiger',
+    status: 'active',
+    zone: 'core',
+    firstSeen: '29 Jan 2026',
+    lastSeenDaysAgo: 0,
+    sightings: 21,
+    source: 'camera',
+    cameraCode: 'C-003',
+    ageClass: 'subadult',
+  },
+  {
+    id: 'T-005',
+    species: 'Tiger',
+    status: 'active',
+    zone: 'core',
+    firstSeen: '11 Jun 2026',
+    lastSeenDaysAgo: 3,
+    sightings: 17,
+    source: 'camera',
+    cameraCode: 'C-008',
+    sex: 'female',
+    ageClass: 'adult',
+  },
+  {
+    id: 'T-014',
+    species: 'Tiger',
+    status: 'active',
+    zone: 'buffer',
+    firstSeen: '02 Aug 2026',
+    lastSeenDaysAgo: 12,
+    sightings: 4,
+    source: 'field',
+  },
+  {
+    id: 'L-002',
+    species: 'Leopard',
+    status: 'archived',
+    zone: 'buffer',
+    firstSeen: '08 Feb 2026',
+    lastSeenDaysAgo: 45,
+    sightings: 6,
+    source: 'camera',
+    cameraCode: 'C-012',
+  },
+];
