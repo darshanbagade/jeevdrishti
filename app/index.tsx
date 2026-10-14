@@ -15,11 +15,21 @@ import { StatCard } from '@/components/ui/StatCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AnimalThumb } from '@/components/ui/AnimalThumb';
 import { spacing, radius, useTheme } from '@/theme';
+import { useIdentifyHistoryStore } from '@/features/identification/historyStore';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const pendingReviewCount = useIdentifyHistoryStore(
+    (state) =>
+      state.entries.filter(
+        (entry) =>
+          entry.reviewStatus === 'not-reviewed' ||
+          entry.reviewStatus === 'pending-review' ||
+          entry.reviewStatus === 'unresolved',
+      ).length,
+  );
   const router = useRouter();
   const clearAssets = useIdentifySelectionStore((state) => state.clearAssets);
 
@@ -162,7 +172,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/identify-history')}
             style={({ pressed }) => [styles.statItem, pressed && styles.pressed]}
           >
-            <StatCard label={t('dashboard.pending')} value="00" icon="clock" />
+            <StatCard label={t('dashboard.pending')} value={String(pendingReviewCount).padStart(2, '0')} icon="clock" />
           </Pressable>
         </View>
 
