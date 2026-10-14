@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import { animalRepository } from '@/features/animals/repository';
 import type { AnimalRecord } from '@/features/animals/types';
 import { formatLastSeen, getAnimalCopy } from '@/features/animals/labels';
 import { useIdentifySelectionStore } from '@/features/identification/selectionStore';
+import { useIdentifyHistoryStore } from '@/features/identification/historyStore';
 import { spacing, radius, useTheme } from '@/theme';
 
 const demoSimilarityScores = [96, 92, 88, 84, 80] as const;
@@ -22,6 +23,11 @@ export default function IdentifyResultsScreen() {
   const { colors } = useTheme();
 
   const assets = useIdentifySelectionStore((state) => state.assets);
+  const addHistoryEntry = useIdentifyHistoryStore((state) => state.addEntry);
+  const [historyHydrated, setHistoryHydrated] = useState(
+    () => useIdentifyHistoryStore.persist.hasHydrated(),
+  );
+  const hasSavedHistory = useRef(false);
   const language = (i18n.resolvedLanguage ?? i18n.language).split('-')[0];
   const copy = getAnimalCopy(language);
 
@@ -29,6 +35,20 @@ export default function IdentifyResultsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
+  useEffect(() => {
+    const unsubscribe = useIdentifyHistoryStore.persist.onFinishHydration(() => {
+      setHistoryHydrated(true);
+    });
+
+    // Handle hydration that finished just before this listener subscribed.
+    void Promise.resolve().then(() => {
+      if (useIdentifyHistoryStore.persist.hasHydrated()) {
+        setHistoryHydrated(true);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
   const loadCandidates = useCallback(async () => {
     setIsLoading(true);
     setLoadError(false);
@@ -51,6 +71,41 @@ export default function IdentifyResultsScreen() {
 
     return () => clearTimeout(timeout);
   }, [loadCandidates]);
+  useEffect(() => {
+    if (
+      !historyHydrated ||
+      isLoading ||
+      loadError ||
+      candidates.length === 0 ||
+      assets.length === 0 ||
+      hasSavedHistory.current
+    ) {
+      return;
+    }
+
+    hasSavedHistory.current = true;
+
+    addHistoryEntry({
+      id: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      createdAt: new Date().toISOString(),
+      source: 'demo',
+      reviewStatus: 'not-reviewed',
+      mediaCount: assets.length,
+      mediaTypes: assets.map((asset) => asset.type ?? 'unknown'),
+      candidates: candidates.slice(0, 5).map((animal, index) => ({
+        rank: index + 1,
+        animal,
+        similarityScore: demoSimilarityScores[index] ?? 0,
+      })),
+    });
+  }, [
+    addHistoryEntry,
+    assets,
+    candidates,
+    historyHydrated,
+    isLoading,
+    loadError,
+  ]);
 
   return (
     <ScreenContainer stripes style={styles.page}>

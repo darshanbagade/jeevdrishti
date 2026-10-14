@@ -100,6 +100,15 @@ export default function HomeScreen() {
           </Button>
         </View>
 
+        <Button
+          variant="ghost"
+          icon="clock"
+          style={{ alignSelf: 'flex-start' }}
+          onPress={() => router.push('/identify-history')}
+        >
+          {t('identifyFlow.historyTitle')}
+        </Button>
+
         <View style={styles.heroFooter}>
           <Icon name="shield" color={colors.primary} size={17} />
           <AppText variant="caption" muted>{t('dashboard.humanReview')}</AppText>
