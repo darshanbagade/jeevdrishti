@@ -2,6 +2,7 @@ import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
+import { useIdentifySelectionStore } from '@/features/identification/selectionStore';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/components/ui/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
@@ -20,6 +21,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
+  const clearAssets = useIdentifySelectionStore((state) => state.clearAssets);
 
   const comingSoon = (title: string) =>
     Alert.alert(title, t('dashboard.comingSoon'));
@@ -89,7 +91,10 @@ export default function HomeScreen() {
             variant="accent"
             icon="identify"
             style={styles.identifyButton}
-            onPress={() => router.push('/identify')}
+            onPress={() => {
+              clearAssets();
+              router.push('/identify');
+            }}
           >
             {t('dashboard.identify')}
           </Button>

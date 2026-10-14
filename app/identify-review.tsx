@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScreenContainer } from '@/components/ui/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
+import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { useIdentifySelectionStore } from '@/features/identification/selectionStore';
 import { spacing, radius, useTheme } from '@/theme';
@@ -168,6 +169,13 @@ export default function IdentifyReviewScreen() {
           <AppText variant="caption" muted>{t('identifyFlow.mlNotConnected')}</AppText>
         </View>
       </View>
+      <Button
+        disabled={assets.length === 0}
+        onPress={() => router.push('/identify-results')}
+        icon="forward"
+      >
+        {t('identifyFlow.continueToResults')}
+      </Button>
     </ScreenContainer>
   );
 }
