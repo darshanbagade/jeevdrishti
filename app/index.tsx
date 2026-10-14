@@ -16,11 +16,13 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AnimalThumb } from '@/components/ui/AnimalThumb';
 import { spacing, radius, useTheme } from '@/theme';
 import { useIdentifyHistoryStore } from '@/features/identification/historyStore';
+import { useSightingsStore } from '@/features/sightings/sightingsStore';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const sightingCount = useSightingsStore((state) => state.sightings.length);
   const pendingReviewCount = useIdentifyHistoryStore(
     (state) =>
       state.entries.filter(
@@ -161,10 +163,10 @@ export default function HomeScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t('dashboard.sightings')}
-            onPress={() => router.push('/tracks')}
+            onPress={() => router.push('/sightings')}
             style={({ pressed }) => [styles.statItem, pressed && styles.pressed]}
           >
-            <StatCard label={t('dashboard.sightings')} value="08" icon="location" />
+            <StatCard label={t('dashboard.sightings')} value={String(sightingCount).padStart(2, '0')} icon="location" />
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -202,7 +204,7 @@ export default function HomeScreen() {
           title={t('dashboard.recent')}
           subtitle={t('dashboard.sampleRecords')}
           actionLabel={t('dashboard.viewAll')}
-          onAction={() => router.push('/tracks')}
+          onAction={() => router.push('/sightings')}
         />
 
         {sightings.map((item) => (
