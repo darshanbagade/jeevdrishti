@@ -21,6 +21,18 @@ export type IdentificationHistoryCandidate = {
   similarityScore: number;
 };
 
+export type IdentificationMediaMetadata = {
+  index: number;
+  mediaType: string;
+  capturedAt: string | null;
+  captureTimeSource: 'photo-exif' | 'camera-return-time' | 'unknown';
+  location: {
+    latitude: number;
+    longitude: number;
+    accuracyMeters: number | null;
+  } | null;
+  locationSource: 'photo-exif' | 'device-gps-after-capture' | 'unknown';
+};
 export type IdentificationHistoryEntry = {
   id: string;
   createdAt: string;
@@ -28,6 +40,8 @@ export type IdentificationHistoryEntry = {
   reviewStatus: IdentificationReviewStatus;
   mediaCount: number;
   mediaTypes: string[];
+  /** Location and capture metadata for each selected media item. */
+  mediaMetadata?: IdentificationMediaMetadata[];
   candidates: IdentificationHistoryCandidate[];
   /** Per-candidate officer decisions; absent entries have not been reviewed. */
   candidateReviews?: Record<string, IdentificationCandidateReviewStatus>;

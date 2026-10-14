@@ -97,6 +97,14 @@ export default function IdentifyResultsScreen() {
       reviewStatus: "not-reviewed",
       mediaCount: assets.length,
       mediaTypes: assets.map((asset) => asset.type ?? "unknown"),
+      mediaMetadata: assets.map((asset, index) => ({
+        index: index + 1,
+        mediaType: asset.type ?? "unknown",
+        capturedAt: asset.capturedAt ?? null,
+        captureTimeSource: asset.captureTimeSource ?? "unknown",
+        location: asset.location ?? null,
+        locationSource: asset.locationSource ?? "unknown",
+      })),
       candidates: candidates.slice(0, 5).map((animal, index) => ({
         rank: index + 1,
         animal,
@@ -227,7 +235,7 @@ export default function IdentifyResultsScreen() {
                     </AppText>
                     <AppText variant="caption" muted>
                       {animal.zone === "core" ? copy.core : copy.buffer}
-                      {" · "}
+                      {" Â· "}
                       {formatLastSeen(animal.lastSeenDaysAgo, copy)}
                     </AppText>
                     <AppText variant="caption" muted>

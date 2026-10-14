@@ -1,3 +1,8 @@
+import * as Location from 'expo-location';
+import {
+  createCameraPhotoMetadata,
+  extractPhotoCaptureMetadata,
+} from '@/features/identification/photoMetadata';
 import { useState } from 'react';
 import {
   Alert,
@@ -41,8 +46,19 @@ export default function IdentifyScreen() {
         return;
       }
 
+      let canUseCaptureLocation = false;
+      if (mode === 'photo') {
+        try {
+          const locationPermission = await Location.requestForegroundPermissionsAsync();
+          canUseCaptureLocation = locationPermission.granted;
+        } catch {
+          canUseCaptureLocation = false;
+        }
+      }
+
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: mode === 'photo' ? ['images'] : ['videos'],
+        exif: mode === 'photo',
         quality: 0.8,
         videoMaxDuration: 15,
       });
@@ -52,12 +68,31 @@ export default function IdentifyScreen() {
       }
 
       const asset = result.assets[0];
+      const photoMetadata =
+        mode === 'photo'
+          ? await createCameraPhotoMetadata(asset.exif, canUseCaptureLocation)
+          : {
+              capturedAt: null,
+              captureTimeSource: 'unknown' as const,
+              location: null,
+              locationSource: 'unknown' as const,
+            };
+
+      const selectedAsset = {
+        uri: asset.uri,
+        type: asset.type,
+        fileName: asset.fileName,
+        width: asset.width,
+        height: asset.height,
+        duration: asset.duration,
+        ...photoMetadata,
+      };
 
       if (
         mode === 'video' ||
         assets.some((item) => item.type === 'video')
       ) {
-        setAssets([asset]);
+        setAssets([selectedAsset]);
         return;
       }
 
@@ -69,7 +104,7 @@ export default function IdentifyScreen() {
         return;
       }
 
-      setAssets((current) => [...current, asset]);
+      setAssets((current) => [...current, selectedAsset]);
     } catch (error) {
       Alert.alert(
         t('identifyFlow.cameraError'),
@@ -86,6 +121,7 @@ export default function IdentifyScreen() {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images', 'videos'],
+        exif: true,
         allowsMultipleSelection: true,
         selectionLimit: 5,
         quality: 0.8,
@@ -148,7 +184,29 @@ export default function IdentifyScreen() {
         return;
       }
 
-      setAssets(result.assets);
+      const selectedAssets = result.assets.map((asset) => {
+        const metadata =
+          asset.type === 'video'
+            ? {
+                capturedAt: null,
+                captureTimeSource: 'unknown' as const,
+                location: null,
+                locationSource: 'unknown' as const,
+              }
+            : extractPhotoCaptureMetadata(asset.exif);
+
+        return {
+          uri: asset.uri,
+          type: asset.type,
+          fileName: asset.fileName,
+          width: asset.width,
+          height: asset.height,
+          duration: asset.duration,
+          ...metadata,
+        };
+      });
+
+      setAssets(selectedAssets);
     } catch (error) {
       Alert.alert(
         t('identifyFlow.galleryError'),

@@ -181,6 +181,26 @@ export default function IdentifyHistoryScreen() {
                     count: entry.candidates.length,
                   })}
                 </AppText>
+                {entry.mediaMetadata?.map((media) => (
+                  <View key={`${entry.id}-media-${media.index}`}>
+                    <AppText variant="caption" muted>
+                      {`Media ${media.index} · ${
+                        media.capturedAt
+                          ? new Date(media.capturedAt).toLocaleString()
+                          : 'Capture time unknown'
+                      }`}
+                    </AppText>
+                    <AppText variant="caption" muted>
+                      {media.location
+                        ? `${media.location.latitude.toFixed(6)}, ${media.location.longitude.toFixed(6)} · ${
+                            media.location.accuracyMeters === null
+                              ? 'accuracy unknown'
+                              : `±${Math.round(media.location.accuracyMeters)} m`
+                          } · ${media.locationSource}`
+                        : `Location unavailable · ${media.locationSource}`}
+                    </AppText>
+                  </View>
+                ))}
                 {entry.reviewedAnimalId ? (
                   <AppText variant="caption" strong>
                     {t('identifyFlow.historyReviewedAnimal', { id: entry.reviewedAnimalId })}
@@ -234,11 +254,11 @@ export default function IdentifyHistoryScreen() {
                             {candidate.animal.species === 'Tiger'
                               ? copy.tiger
                               : copy.leopard}
-                            {' · '}
+                            {' Â· '}
                             {candidate.animal.zone === 'core'
                               ? copy.core
                               : copy.buffer}
-                            {' · '}
+                            {' Â· '}
                             {formatLastSeen(candidate.animal.lastSeenDaysAgo, copy)}
                           </AppText>
                           <AppText variant="caption" muted>

@@ -7,6 +7,14 @@ export type SelectedMediaAsset = {
   width?: number;
   height?: number;
   duration?: number | null;
+  capturedAt?: string | null;
+  captureTimeSource?: 'photo-exif' | 'camera-return-time' | 'unknown';
+  location?: {
+    latitude: number;
+    longitude: number;
+    accuracyMeters: number | null;
+  } | null;
+  locationSource?: 'photo-exif' | 'device-gps-after-capture' | 'unknown';
 };
 
 type IdentifySelectionState = {
