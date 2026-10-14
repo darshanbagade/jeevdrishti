@@ -127,9 +127,11 @@ export default function IdentifyHistoryScreen() {
                 ? t('identifyFlow.historyConfirmed')
                 : entry.reviewStatus === 'rejected'
                   ? t('identifyFlow.historyRejected')
-                  : entry.reviewStatus === 'pending-review'
-                    ? t('identifyFlow.historyPending')
-                    : t('identifyFlow.historyNotReviewed');
+                  : entry.reviewStatus === 'unresolved'
+                    ? t('identifyFlow.historyUnresolved')
+                    : entry.reviewStatus === 'pending-review'
+                      ? t('identifyFlow.historyPending')
+                      : t('identifyFlow.historyNotReviewed');
 
             return (
               <View
@@ -179,6 +181,23 @@ export default function IdentifyHistoryScreen() {
                     count: entry.candidates.length,
                   })}
                 </AppText>
+                {entry.reviewedAnimalId ? (
+                  <AppText variant="caption" strong>
+                    {t('identifyFlow.historyReviewedAnimal', { id: entry.reviewedAnimalId })}
+                  </AppText>
+                ) : null}
+                <Button
+                  variant="ghost"
+                  icon="forward"
+                  onPress={() =>
+                    router.push({
+                      pathname: '/identify-match-review',
+                      params: { historyId: entry.id },
+                    })
+                  }
+                >
+                  {t('identifyFlow.matchReviewOpen')}
+                </Button>
 
                 {entry.candidates.length > 0 ? (
                   <View style={styles.candidatesSection}>
@@ -223,9 +242,13 @@ export default function IdentifyHistoryScreen() {
                             {formatLastSeen(candidate.animal.lastSeenDaysAgo, copy)}
                           </AppText>
                           <AppText variant="caption" muted>
-                            {entry.source === 'demo'
-                              ? t('identifyFlow.resultsSampleSimilarity')
-                              : t('identifyFlow.historyModelScoreLabel')}
+                            {entry.candidateReviews?.[candidate.animal.id] === 'confirmed'
+                              ? t('identifyFlow.candidateReviewConfirmed')
+                              : entry.candidateReviews?.[candidate.animal.id] === 'rejected'
+                                ? t('identifyFlow.candidateReviewRejected')
+                                : entry.source === 'demo'
+                                  ? t('identifyFlow.resultsSampleSimilarity')
+                                  : t('identifyFlow.historyModelScoreLabel')}
                           </AppText>
                         </View>
 
