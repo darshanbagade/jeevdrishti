@@ -56,7 +56,7 @@ function StatusBadge({
 export default function AnimalProfileScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string }>();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { colors } = useTheme();
   const language = (i18n.resolvedLanguage ?? i18n.language).split('-')[0];
   const copy = getAnimalCopy(language);
@@ -175,6 +175,14 @@ export default function AnimalProfileScreen() {
             {animal.notes ? <InfoRow label={copy.notes} value={animal.notes} /> : null}
           </Card>
 
+          <Button
+            icon="tracks"
+            onPress={() =>
+              router.push({ pathname: '/tracks/[id]', params: { id: animal.id } } as never)
+            }
+          >
+            {t('tracking.openMap')}
+          </Button>
           <Card style={styles.noticeCard}>
             <AppText variant="caption" muted>{copy.internalIdNote}</AppText>
           </Card>

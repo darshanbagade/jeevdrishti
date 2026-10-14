@@ -109,6 +109,15 @@ export default function HomeScreen() {
           {t('identifyFlow.historyTitle')}
         </Button>
 
+        <Button
+          variant="ghost"
+          icon="tracks"
+          style={{ alignSelf: 'flex-start' }}
+          onPress={() => router.push('/tracks')}
+        >
+          {t('tracking.openMap')}
+        </Button>
+
         <View style={styles.heroFooter}>
           <Icon name="shield" color={colors.primary} size={17} />
           <AppText variant="caption" muted>{t('dashboard.humanReview')}</AppText>
