@@ -178,7 +178,7 @@ export default function IdentifyMatchReviewScreen() {
                     },
                   ]}
                 >
-                  <AnimalThumb size={56} />
+                  <AnimalThumb size={56} imageUri={candidate.animal.referenceImageUri} />
                   <View style={styles.candidateDetails}>
                     <AppText variant="subtitle" strong>{candidate.animal.id}</AppText>
                     <AppText variant="caption" muted>

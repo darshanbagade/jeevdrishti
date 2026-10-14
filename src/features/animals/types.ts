@@ -1,6 +1,7 @@
 export type AnimalRecord = {
   id: string;
   displayName?: string;
+  referenceImageUri?: string;
   species: 'Tiger' | 'Leopard';
   status: 'active' | 'archived';
   zone: 'core' | 'buffer';
