@@ -1,4 +1,4 @@
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
@@ -23,8 +23,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const clearAssets = useIdentifySelectionStore((state) => state.clearAssets);
 
-  const comingSoon = (title: string) =>
-    Alert.alert(title, t('dashboard.comingSoon'));
 
   const sightings = [
     { id: 'T-003', zone: 'coreZone', time: 'today', status: 'matched' as const },
@@ -139,20 +137,41 @@ export default function HomeScreen() {
           >
             <StatCard label={t('dashboard.animals')} value="06" icon="animals" />
           </Pressable>
-          <View style={styles.statItem}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('dashboard.referenceImages')}
+            onPress={() => router.push('/animals')}
+            style={({ pressed }) => [styles.statItem, pressed && styles.pressed]}
+          >
             <StatCard label={t('dashboard.referenceImages')} value="33" icon="image" />
-          </View>
+          </Pressable>
         </View>
 
         <View style={styles.statRow}>
-          <View style={styles.statItem}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('dashboard.sightings')}
+            onPress={() => router.push('/tracks')}
+            style={({ pressed }) => [styles.statItem, pressed && styles.pressed]}
+          >
             <StatCard label={t('dashboard.sightings')} value="08" icon="location" />
-          </View>
-          <View style={styles.statItem}>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('dashboard.pending')}
+            onPress={() => router.push('/identify-history')}
+            style={({ pressed }) => [styles.statItem, pressed && styles.pressed]}
+          >
             <StatCard label={t('dashboard.pending')} value="00" icon="clock" />
-          </View>
+          </Pressable>
         </View>
 
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('dashboard.cameras')}
+            onPress={() => router.push('/cctv-cameras')}
+            style={({ pressed }) => [pressed && styles.pressed]}
+          >
         <Card padding={spacing.md}>
           <View style={styles.cameraStat}>
             <View style={[styles.cameraIcon, { backgroundColor: colors.surfaceRaised }]}>
@@ -165,6 +184,7 @@ export default function HomeScreen() {
             <AppText variant="title" strong>10</AppText>
           </View>
         </Card>
+          </Pressable>
       </View>
 
       <View style={styles.section}>
@@ -172,7 +192,7 @@ export default function HomeScreen() {
           title={t('dashboard.recent')}
           subtitle={t('dashboard.sampleRecords')}
           actionLabel={t('dashboard.viewAll')}
-          onAction={() => comingSoon(t('dashboard.recent'))}
+          onAction={() => router.push('/tracks')}
         />
 
         {sightings.map((item) => (
@@ -180,7 +200,7 @@ export default function HomeScreen() {
             key={item.id}
             accessibilityRole="button"
             accessibilityLabel={item.id + ', ' + t('dashboard.' + item.zone)}
-            onPress={() => comingSoon(item.id)}
+            onPress={() => router.push({ pathname: '/animal/[id]', params: { id: item.id } })}
             style={({ pressed }) => [pressed && styles.pressed]}
           >
             <Card padding={spacing.sm}>
